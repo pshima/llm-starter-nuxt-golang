@@ -174,6 +174,12 @@ func corsMiddleware(allowedOrigins []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
 		
+		// Always set CORS headers
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Cookie")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Max-Age", "86400") // 24 hours preflight cache
+		
 		// Check if origin is allowed
 		allowed := false
 		for _, allowedOrigin := range allowedOrigins {
@@ -183,14 +189,14 @@ func corsMiddleware(allowedOrigins []string) gin.HandlerFunc {
 			}
 		}
 
-		if allowed {
+		if allowed && origin != "" {
 			c.Header("Access-Control-Allow-Origin", origin)
+		} else if len(allowedOrigins) > 0 && origin == "" {
+			// For requests without origin header (like from Postman), allow the first configured origin
+			c.Header("Access-Control-Allow-Origin", allowedOrigins[0])
 		}
-		
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		c.Header("Access-Control-Allow-Credentials", "true")
 
+		// Handle preflight requests
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
 			return

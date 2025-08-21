@@ -1,0 +1,45 @@
+{
+  "name": "nuxt-app",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test --headed",
+    "test:e2e:headless": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:docker": "playwright test --headed --config=playwright.config.docker.ts",
+    "test:e2e:docker:headless": "playwright test --config=playwright.config.docker.ts",
+    "test:e2e:install": "playwright install",
+    "screenshots": "node scripts/capture-screenshots.cjs",
+    "screenshots:headless": "HEADLESS=true node scripts/capture-screenshots.cjs",
+    "screenshots:test": "node scripts/test-screenshot-system.cjs"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
+    "@pinia/nuxt": "^0.11.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "nuxt": "^4.0.3",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@nuxt/test-utils": "^3.19.1",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@playwright/test": "^1.48.2",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^17.6.3",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.0.6"
+  }
+}

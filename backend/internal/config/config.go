@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"backend/pkg/redis"
 )
@@ -98,7 +99,7 @@ func Load() *Config {
 		Security: SecurityConfig{
 			RateLimit:      getEnvAsInt("RATE_LIMIT", 1000),
 			EnableCORS:     getEnvAsBool("ENABLE_CORS", true),
-			AllowedOrigins: []string{getEnv("FRONTEND_URL", "http://localhost:3000")},
+			AllowedOrigins: getEnvAsSlice("CORS_ALLOWED_ORIGINS", []string{"http://localhost:3000", "http://localhost:3001"}),
 		},
 	}
 }
@@ -142,6 +143,21 @@ func getEnvAsBool(key string, defaultValue bool) bool {
 		if boolValue, err := strconv.ParseBool(value); err == nil {
 			return boolValue
 		}
+	}
+	return defaultValue
+}
+
+// getEnvAsSlice gets an environment variable as a comma-separated slice with a fallback default
+// Returns the default if the environment variable is not set
+func getEnvAsSlice(key string, defaultValue []string) []string {
+	if value := os.Getenv(key); value != "" {
+		// Split by comma and trim whitespace
+		parts := strings.Split(value, ",")
+		result := make([]string, len(parts))
+		for i, part := range parts {
+			result[i] = strings.TrimSpace(part)
+		}
+		return result
 	}
 	return defaultValue
 }

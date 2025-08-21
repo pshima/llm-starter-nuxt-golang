@@ -269,6 +269,26 @@ Use `make pre-commit` to run both documentation checks and tests before committi
 - **Session Cookie Testing**: Use `httptest.NewRecorder()` and extract cookies for subsequent requests
 - **Redis in Docker**: Always expose Redis port in docker-compose for debugging with redis-cli
 
+## Frontend Import Rules - CRITICAL
+- **NEVER use `~` alias for imports**: The `~` alias does not work properly in Nuxt 4, especially in Docker environments
+- **Always use relative paths**: Use `../` for imports (e.g., `import { useApi } from '../composables/useApi'`)
+- **For Nuxt built-ins use `#app`**: Use `import { navigateTo } from '#app'` for Nuxt utilities
+- **Auto-imports are unreliable**: Always add explicit imports for stores, composables, and types
+- **This applies to ALL files**: Components, pages, stores, middleware, composables - everything needs explicit relative imports
+
+## Frontend-Backend Field Naming Conventions - CRITICAL
+- **Backend uses camelCase**: Go JSON tags use camelCase (e.g., `displayName`, `createdAt`)
+- **Frontend MUST match backend**: TypeScript interfaces and form fields must use the same camelCase naming
+- **Common field mappings**:
+  - `displayName` NOT `display_name`
+  - `createdAt` NOT `created_at`
+  - `updatedAt` NOT `updated_at`
+  - `deletedAt` NOT `deleted_at`
+  - `userId` NOT `user_id`
+  - `rememberMe` NOT `remember_me`
+- **Always check backend structs**: Before creating frontend types, check the Go struct JSON tags
+- **Validation errors**: "Email, password, and display name are required" usually means field name mismatch
+
 ## Testing Best Practices Discovered
 - **Miniredis Usage**: Use miniredis for all Redis testing to avoid external dependencies
 - **Test Helpers**: Create comprehensive test helpers for common operations (user creation, authentication)

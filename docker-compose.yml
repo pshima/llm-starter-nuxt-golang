@@ -1,4 +1,22 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: task-tracker-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NUXT_PUBLIC_API_BASE=http://localhost:8080/api/v1
+    depends_on:
+      - backend
+    networks:
+      - task-tracker-network
+
   backend:
     build:
       context: ./backend
@@ -20,7 +38,7 @@ services:
       - SMTP_HOST=mailhog
       - SMTP_PORT=1025
       - SMTP_FROM=noreply@no.reply.com
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://frontend:3000
     depends_on:
       - redis
       - mailhog

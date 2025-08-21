@@ -14,6 +14,7 @@ A full-stack task management application built with Go (backend) and Nuxt.js (fr
 | [TEST.md](TEST.md) | Testing patterns and strategies | When writing tests |
 | [CLAUDE.md](CLAUDE.md) | Development guidelines and conventions | All developers |
 | [TASK.md](TASK.md) | Task tracking and progress | Daily development |
+| [SCREENSHOTS.md](SCREENSHOTS.md) | Complete UI documentation with screenshots | When reviewing UI/UX |
 | [backend/api/openapi.yaml](backend/api/openapi.yaml) | OpenAPI specification | API development |
 
 ## Features
@@ -29,19 +30,27 @@ A full-stack task management application built with Go (backend) and Nuxt.js (fr
 - **Hot Reload**: Development environment with automatic code reloading
 - **Comprehensive Testing**: >80% test coverage with unit and integration tests
 
-### Frontend (Coming Soon)
-- Nuxt.js with TypeScript
-- Tailwind CSS for styling
-- Pinia for state management
+### Frontend (Completed)
+- **Nuxt.js with TypeScript**: Modern Vue.js framework with type safety
+- **Tailwind CSS**: Utility-first CSS framework for beautiful, responsive design
+- **Pinia State Management**: Centralized state with auth and task stores
+- **Authentication Pages**: Login and registration with form validation
+- **Dashboard**: Welcome page with feature overview and statistics
+- **Task Management UI**: Complete CRUD interface with inline editing
+- **Category System**: Create and manage task categories
+- **Filtering**: View completed and deleted tasks with toggles
+- **Responsive Design**: Mobile-first approach with hamburger menu
+- **Testing**: Unit tests with Vitest, E2E tests with Playwright
 
 ## Quick Start
 
 ### Prerequisites
 - Docker and Docker Compose
 - Make (optional, for convenience commands)
-- Go 1.21+ (for local development without Docker)
+- Node.js 18+ (for local frontend development)
+- Go 1.21+ (for local backend development)
 
-### Running the Backend
+### Running the Full Stack
 
 1. Clone the repository:
 ```bash
@@ -49,26 +58,91 @@ git clone <repository-url>
 cd llm-starter-nuxt-golang
 ```
 
-2. Start the development environment:
+2. Start both backend and frontend with Docker:
+```bash
+# Start all services (backend, frontend, Redis, MailHog)
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up -d --build
+```
+
+3. Access the application:
+   - **Frontend**: `http://localhost:3000`
+   - **Backend API**: `http://localhost:8080`
+   - **MailHog**: `http://localhost:8025` (view test emails)
+
+4. Default test user (if seeded):
+   - Email: `test@example.com`
+   - Password: `Test123!`
+
+### Running the Backend Only
+
+1. Start the backend services:
 ```bash
 make dev
 # or without make:
-docker-compose up --build
+docker-compose up backend redis mailhog
 ```
 
-3. The backend will be available at `http://localhost:8080`
+2. The backend will be available at `http://localhost:8080`
    - Health check: `GET http://localhost:8080/health`
    - API documentation: See `/backend/api/openapi.yaml`
 
-4. MailHog web UI is available at `http://localhost:8025` for viewing emails
+### Running the Frontend Only
+
+1. Make sure the backend is running (see above)
+
+2. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+3. Install dependencies:
+```bash
+npm install
+```
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+5. Open `http://localhost:3000` in your browser
 
 ### Running Tests
 
-Run all tests in Docker:
+#### Backend Tests
+Run all backend tests in Docker:
 ```bash
 make test
 # or without make:
 docker-compose -f docker-compose.test.yml up --build
+```
+
+#### Frontend Unit Tests
+```bash
+cd frontend
+npm run test          # Run once
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+```
+
+#### Frontend E2E Tests
+```bash
+cd frontend
+
+# Run with browser UI (development)
+npm run test:e2e
+
+# Run headless (CI)
+npm run test:e2e:headless
+
+# Run against Docker stack
+npm run test:e2e:docker
+
+# Interactive UI mode
+npm run test:e2e:ui
 ```
 
 ## API Endpoints
@@ -148,7 +222,31 @@ curl -X GET http://localhost:8080/api/v1/tasks \
 │   ├── pkg/redis/          # Redis client
 │   ├── api/                # OpenAPI specification
 │   └── tests/              # Integration tests
-├── frontend/               # Nuxt.js frontend (coming soon)
+├── frontend/
+│   ├── components/         # Vue components
+│   │   ├── AppHeader.vue   # Navigation header
+│   │   ├── TaskItem.vue    # Individual task display
+│   │   ├── TaskList.vue    # Task list container
+│   │   ├── TaskModal.vue   # Task creation/edit modal
+│   │   └── TaskFilters.vue # Filter controls
+│   ├── layouts/            # Page layouts
+│   │   ├── default.vue     # Authenticated layout
+│   │   └── auth.vue        # Public/auth layout
+│   ├── pages/              # Route pages
+│   │   ├── index.vue       # Welcome page
+│   │   ├── login.vue       # Login page
+│   │   ├── register.vue    # Registration page
+│   │   ├── dashboard.vue   # User dashboard
+│   │   └── tasks.vue       # Task management
+│   ├── stores/             # Pinia stores
+│   │   ├── auth.ts         # Authentication state
+│   │   └── tasks.ts        # Task management state
+│   ├── middleware/         # Route middleware
+│   ├── composables/        # Shared composables
+│   ├── types/              # TypeScript types
+│   └── tests/              # Tests
+│       ├── unit/           # Unit tests
+│       └── e2e/            # E2E tests
 ├── docker-compose.yml      # Development environment
 └── docker-compose.test.yml # Test environment
 ```
@@ -187,13 +285,109 @@ Key environment variables (see docker-compose.yml for full list):
 - Input validation and sanitization
 - Rate limiting support (1000 requests/minute per IP)
 
+## Frontend Import Rules - CRITICAL
+
+**NEVER use the `~` alias in imports - it's broken in Nuxt 4/Docker environments**
+
+```typescript
+// ❌ WRONG - Will cause "Failed to resolve import" errors
+import { useAuthStore } from '~/stores/auth'
+import { useApi } from '~/composables/useApi'
+
+// ✅ CORRECT - Use relative paths
+import { useAuthStore } from '../stores/auth'
+import { useApi } from '../composables/useApi'
+import type { User } from '../types'
+
+// ✅ CORRECT - Use #app for Nuxt utilities
+import { navigateTo } from '#app'
+```
+
+## Frontend-Backend Field Naming Convention
+
+**ALWAYS use camelCase for JSON fields to match the backend**
+
+```typescript
+// ❌ WRONG - Backend expects camelCase
+interface RegisterRequest {
+  display_name: string  // Will cause "field required" errors
+  created_at: string
+}
+
+// ✅ CORRECT - Matches backend JSON tags
+interface RegisterRequest {
+  displayName: string   // Matches Go: `json:"displayName"`
+  createdAt: string     // Matches Go: `json:"createdAt"`
+}
+```
+
+Common field mappings:
+- `displayName` (NOT display_name)
+- `createdAt` (NOT created_at)
+- `updatedAt` (NOT updated_at)
+- `userId` (NOT user_id)
+
 ## Testing
 
-The project includes comprehensive testing:
+The project includes comprehensive testing for both backend and frontend:
+
+### Backend Testing
 - **Unit Tests**: Repository, service, and handler layers
 - **Integration Tests**: Full API workflow testing
 - **Test Coverage**: >80% across all packages
 - **Test Tools**: Go testing, testify, miniredis for Redis mocking
+
+### Frontend Testing
+- **Unit Tests**: Components and pages with Vitest
+- **E2E Tests**: Full user flows with Playwright
+- **Test Coverage**: Components, stores, and composables
+- **Test Patterns**: Page Object Model for maintainable E2E tests
+- **Browser Testing**: Tests run in headed mode for visibility during development
+
+## Screenshots & Documentation
+
+The project includes an automated screenshot capture system for comprehensive UI documentation.
+
+### Visual Documentation
+- **Complete UI Coverage**: All pages, forms, modals, and states
+- **Up-to-date Screenshots**: Easily regenerated when UI changes
+- **Organized Documentation**: Generated `SCREENSHOTS.md` with embedded images
+- **Desktop Focused**: 1920x1080 viewport for consistent documentation
+
+### Capturing Screenshots
+```bash
+# Ensure both servers are running
+docker-compose up -d  # Backend on :8080
+cd frontend && npm run dev  # Frontend on :3000
+
+# Capture all screenshots (visible browser)
+cd frontend
+npm run screenshots
+
+# Or run in headless mode
+npm run screenshots:headless
+```
+
+### What Gets Captured
+- **Authentication Flow**: Login, register, validation states
+- **Main Pages**: Dashboard, tasks, navigation
+- **Interactive Elements**: Modals, forms, dropdowns
+- **Task Management**: Creation, editing, filtering, categories
+- **Error States**: 404 pages, validation errors
+
+### Output
+- **Screenshots**: Stored in `frontend/screenshots/` with descriptive names
+- **Documentation**: Auto-generated `SCREENSHOTS.md` at project root
+- **Organization**: Grouped by feature (Authentication, Task Management, etc.)
+
+### Maintenance
+Run screenshot capture after:
+- Significant UI changes
+- New feature additions  
+- Before releases
+- During design reviews
+
+See `frontend/scripts/README.md` for detailed usage instructions.
 
 ## Troubleshooting
 
@@ -214,7 +408,52 @@ The project includes comprehensive testing:
 - **Solution**: Rebuild containers: `docker-compose down && docker-compose up --build`
 - **Solution**: Check Air hot reload logs: `docker-compose logs backend`
 
+### Frontend Issues
+
+**Problem**: Pinia store not found or undefined errors
+- **Solution**: Always use explicit imports for Pinia stores:
+```typescript
+// REQUIRED: Explicit import
+import { useAuthStore } from '~/stores/auth'
+import { useTaskStore } from '~/stores/tasks'
+
+// This will NOT work reliably with auto-imports
+const authStore = useAuthStore() // May fail without explicit import
+```
+
+**Problem**: API calls failing with CORS errors
+- **Solution**: Ensure backend is running on port 8080
+- **Solution**: Check `nuxt.config.ts` has correct API URL configuration
+
+**Problem**: Hot reload not working in frontend
+- **Solution**: Ensure volume mounting is correct in docker-compose.yml
+- **Solution**: Try restarting the frontend container
+
 ### Development Tips
+
+#### Frontend Development
+
+1. **Pinia Stores**: Always use explicit imports for stores
+```typescript
+// Correct
+import { useAuthStore } from '~/stores/auth'
+
+// Won't work reliably with auto-imports
+const authStore = useAuthStore() // May fail
+```
+
+2. **API Calls**: Use the `useApi` composable for consistent error handling
+```typescript
+const { $api } = useNuxtApp()
+const response = await $api('/tasks', { method: 'POST', body: data })
+```
+
+3. **Testing Components**: Use the test utilities in `frontend/tests/utils/`
+```typescript
+import { renderWithClient } from '~/tests/utils/test-utils'
+```
+
+4. **Hot Reload**: Frontend changes reflect immediately, no restart needed
 
 #### Adding New Endpoints
 

@@ -1,5 +1,20 @@
 # API Usage Guide
 
+## CRITICAL: Field Naming Convention
+
+**All JSON fields use camelCase naming**. Frontend TypeScript interfaces MUST match these exact field names.
+
+| Go Struct Field | JSON Tag | Example |
+|-----------------|----------|---------|
+| DisplayName | `displayName` | "John Doe" |
+| CreatedAt | `createdAt` | "2024-01-01T00:00:00Z" |
+| UpdatedAt | `updatedAt` | "2024-01-01T00:00:00Z" |
+| DeletedAt | `deletedAt` | "2024-01-01T00:00:00Z" |
+| UserID | `userId` | "user123" |
+| RememberMe | `rememberMe` | true |
+
+⚠️ **Common Error**: If you get "Email, password, and display name are required" when all fields appear filled, check that you're using `displayName` not `display_name`.
+
 ## Authentication Flow
 
 ### Overview

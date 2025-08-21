@@ -227,6 +227,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 // Configures cookie for 7-day expiration with security flags
 func (h *AuthHandler) setSessionCookie(c *gin.Context, sessionID string) {
 	// Set session cookie for 7 days (604800 seconds)
+	// Note: SameSite=Lax is the default for modern browsers
 	c.SetCookie(
 		"session",      // name
 		sessionID,      // value

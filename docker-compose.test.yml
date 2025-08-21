@@ -17,10 +17,76 @@ services:
       - SMTP_HOST=mailhog-test
       - SMTP_PORT=1025
       - SMTP_FROM=noreply@no.reply.com
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://frontend-test:3000
     depends_on:
       - redis-test
       - mailhog-test
+    networks:
+      - task-tracker-test-network
+
+  # Backend service for E2E testing (runs the server, not tests)
+  backend-e2e:
+    build:
+      context: ./backend
+      target: dev
+    container_name: task-tracker-backend-e2e
+    command: air
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENV=test
+      - SERVER_PORT=8080
+      - SERVER_HOST=0.0.0.0
+      - REDIS_HOST=redis-test
+      - REDIS_PORT=6379
+      - REDIS_DB=1
+      - SESSION_SECRET=test-secret-key-e2e
+      - SMTP_HOST=mailhog-test
+      - SMTP_PORT=1025
+      - SMTP_FROM=noreply@no.reply.com
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://frontend-test:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis-test
+      - mailhog-test
+    networks:
+      - task-tracker-test-network
+
+  # Frontend service for E2E testing
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: task-tracker-frontend-test
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NUXT_PUBLIC_API_BASE=http://backend-e2e:8080/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend-e2e
+    networks:
+      - task-tracker-test-network
+
+  # Playwright E2E test runner
+  playwright-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: task-tracker-playwright-test
+    command: npm run test:e2e:headless
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - BASE_URL=http://frontend-test:3000
+    depends_on:
+      - frontend-test
+      - backend-e2e
     networks:
       - task-tracker-test-network
 
