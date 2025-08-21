@@ -1,0 +1,6 @@
+{
+  "hooks": {
+    "user-prompt-submit": "$CLAUDE_PROJECT_DIR/.claude/hooks/sound.sh",
+    "assistant-response-complete": "$CLAUDE_PROJECT_DIR/.claude/hooks/sound.sh"
+  }
+}
