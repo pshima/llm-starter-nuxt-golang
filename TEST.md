@@ -17,3 +17,81 @@
 - Use miniredis for Redis testing (in-memory Redis mock for Go tests)
 - Good tests are fast, isolated, repeatable, self checking, and timely.
 - Use a separate agent to write and run tests.
+
+## Repository Testing Patterns
+
+### Redis Testing with Miniredis
+```go
+// Setup pattern for repository tests
+func setupTestRedis(t *testing.T) (*miniredis.Miniredis, *redis.Client) {
+    mr, err := miniredis.Run()
+    require.NoError(t, err)
+    
+    client := redis.NewClient(&redis.Options{
+        Addr: mr.Addr(),
+    })
+    
+    t.Cleanup(func() {
+        client.Close()
+        mr.Close()
+    })
+    
+    return mr, client
+}
+```
+
+### TTL Testing Strategy
+- Use miniredis's `FastForward()` to simulate time passage
+- Set TTL on keys and fast-forward to test expiration
+- Always verify TTL values after setting them
+- Test both before and after expiration states
+
+### Transaction Testing
+- Use Redis pipelines for atomic operations
+- Test rollback scenarios by simulating failures
+- Verify all keys are updated atomically
+- Test concurrent access patterns
+
+## Service Testing Patterns
+
+### Mock Generation
+```go
+// Generate mocks for interfaces
+//go:generate mockery --name=UserRepository --output=../mocks --outpkg=mocks
+```
+
+### Business Logic Isolation
+- Mock all repository dependencies
+- Test validation logic separately from persistence
+- Use table-driven tests for multiple scenarios
+- Test error propagation from repository to service
+
+### Validation Testing Strategy
+- Test boundary conditions (min/max lengths)
+- Test required field validation
+- Test format validation (email, etc.)
+- Test business rule enforcement
+
+## Integration Testing Patterns
+
+### Test Server Setup
+```go
+func SetupTestServer(t *testing.T) *TestServer {
+    // Initialize miniredis
+    // Wire up all dependencies
+    // Create test router
+    // Return test server struct with cleanup
+}
+```
+
+### Session Management in Tests
+- Create helper functions for login/logout
+- Store cookies between requests
+- Test session expiration scenarios
+- Verify session isolation between users
+
+### End-to-End Workflow Testing
+- Test complete user journeys
+- Verify data persistence across requests
+- Test error recovery scenarios
+- Validate response formats against OpenAPI spec

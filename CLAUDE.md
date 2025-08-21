@@ -22,6 +22,7 @@
 - Do not make up or imagine any libraries that do not exist.  If we import or utilize a library it needs to be a real library.
 - Hot reload should be enabled for development.  We should not be rebuilding and restarting contianers to see changes.  Prioritize this.
 - Add files we should not commit to source code to the .gitignore file BEFORE we do any commits.
+- Git commit after completing each task, make small iterative commits rather than large commits.
 
 ## Philosophical
 - Simple is better than complicated
@@ -29,7 +30,118 @@
 
 ## Task Completion
 - **Mark completed tasks in `TASK.md`** immediately after finishing them.
-- Add new sub-tasks or TODOs discovered during development to `TASK.md` under a “Discovered During Work” section.
+- Add new sub-tasks or TODOs discovered during development to `TASK.md` under a "Discovered During Work" section.
+
+## Documentation Maintenance Requirements
+
+### Files That MUST Be Updated
+
+When making changes to the codebase, update the following documentation files as appropriate:
+
+#### On Every Change
+1. **TASK.md** - Mark tasks complete, add new discovered tasks
+2. **README.md** - Update if user-facing features change or new setup steps are added
+
+#### On Architecture Changes
+1. **ARCHITECTURE.md** - Update when:
+   - Adding new layers or components
+   - Changing Redis data structures or key patterns
+   - Modifying the clean architecture boundaries
+   - Adding new features (include the step-by-step process)
+   - Changing dependency flow or interfaces
+
+#### On API Changes
+1. **API_GUIDE.md** - Update when:
+   - Adding, modifying, or removing endpoints
+   - Changing request/response formats
+   - Adding new error codes
+   - Modifying authentication flow
+   - Adding new query parameters or filters
+
+2. **backend/api/openapi.yaml** - Update BEFORE implementing any API changes
+
+#### On Security Changes
+1. **SECURITY.md** - Update when:
+   - Changing authentication/authorization logic
+   - Modifying password requirements
+   - Adding new validation rules
+   - Changing session management
+   - Updating security headers or CORS settings
+   - Discovering security vulnerabilities
+
+#### On Testing Changes
+1. **TEST.md** - Update when:
+   - Discovering new testing patterns
+   - Adding new testing utilities
+   - Changing testing strategies
+   - Finding better ways to test specific scenarios
+
+#### On Deployment Changes
+1. **DEPLOYMENT.md** - Update when:
+   - Adding new environment variables
+   - Changing Docker configuration
+   - Modifying production setup
+   - Adding new monitoring or maintenance procedures
+   - Changing scaling strategies
+
+#### On Configuration Changes
+1. **CLAUDE.md** - Update when:
+   - Learning new best practices
+   - Discovering common pitfalls
+   - Adding new error code ranges
+   - Changing development workflow
+
+### Documentation Update Checklist
+
+Before committing any code changes, ask yourself:
+
+- [ ] Does this change how users interact with the system? → Update **README.md**
+- [ ] Does this change the API? → Update **API_GUIDE.md** and **openapi.yaml**
+- [ ] Does this change the architecture? → Update **ARCHITECTURE.md**
+- [ ] Does this change security measures? → Update **SECURITY.md**
+- [ ] Does this change deployment requirements? → Update **DEPLOYMENT.md**
+- [ ] Did I learn something new while implementing this? → Update **CLAUDE.md** or **TEST.md**
+- [ ] Did I complete a task? → Update **TASK.md**
+
+### Error Code Allocation for New Features
+
+When adding new features, allocate error codes in these ranges:
+- **System/Config**: Use next available in 1001-1099 range
+- **Repository/Data**: Use next available in 2001-2099 range  
+- **Service/Business**: Use next available in 3001-3099 range
+- **Handler/API**: Use next available in 4001-4099 range
+
+Document new error codes in:
+1. The code where they're defined
+2. **API_GUIDE.md** (Error Code Reference section)
+3. **CLAUDE.md** (Error Code Ranges section)
+
+### Documentation Quality Standards
+
+All documentation updates must:
+1. Include concrete examples where applicable
+2. Explain both the "what" and the "why"
+3. Be updated BEFORE or WITH code changes, not after
+4. Include timestamps for time-sensitive information
+5. Reference related documentation when appropriate
+6. Maintain consistent formatting with existing content
+
+### Documentation Validation
+
+Run the documentation check before committing:
+```bash
+make check-docs
+# or
+./scripts/check-docs.sh
+```
+
+This script validates:
+- All required documentation files exist
+- Documentation isn't stale (>30 days old)
+- No pending TODO items in docs
+- API documentation matches OpenAPI spec
+
+Use `make pre-commit` to run both documentation checks and tests before committing.
 
 ## Error Handling and Debugging
 - Debugging is a critical part of software development, always create the necessary basic debugging abilities
@@ -149,3 +261,24 @@
 - Write the tests first, then write the code that passes the tests.
 - When you think you are complete, run the full tests and make sure they pass
 - When all the tests pass, ask yourself, is this work of the quality an expert in this area would agree with?  If you are unsure, ask questions.
+
+## Development Workflow - Lessons Learned
+- **Docker Host Binding**: Always use `SERVER_HOST=0.0.0.0` in Docker containers, not localhost
+- **Air Package**: Use `github.com/air-verse/air` (not the old cosmtrek path)
+- **Password JSON Serialization**: Ensure password fields are included in JSON tags for repository storage
+- **Session Cookie Testing**: Use `httptest.NewRecorder()` and extract cookies for subsequent requests
+- **Redis in Docker**: Always expose Redis port in docker-compose for debugging with redis-cli
+
+## Testing Best Practices Discovered
+- **Miniredis Usage**: Use miniredis for all Redis testing to avoid external dependencies
+- **Test Helpers**: Create comprehensive test helpers for common operations (user creation, authentication)
+- **Integration Test Pattern**: Set up complete test server with all dependencies wired
+- **Mock Generation**: Use `mockery` or manual mocks with testify/mock for all interfaces
+- **TTL Testing**: Use miniredis's `FastForward()` to test time-based expiration
+
+## Error Code Ranges (Implemented)
+- **1001-1010**: System/configuration errors (server startup, config loading)
+- **2001-2020**: Repository layer errors (Redis operations, data access)
+- **3001-3010**: User service errors (registration, login, validation)
+- **3011-3020**: Task service errors (task operations, category management)
+- **4001-4020**: Handler/API errors (HTTP layer, request validation)

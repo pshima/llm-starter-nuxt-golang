@@ -2,6 +2,20 @@
 
 A full-stack task management application built with Go (backend) and Nuxt.js (frontend - coming soon). Features user authentication, task management with categories, and soft delete functionality.
 
+## Documentation Index
+
+| Document | Purpose | When to Read |
+|----------|---------|--------------|
+| [README.md](README.md) | Project overview and quick start | First time users |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System design and structure | Before adding features |
+| [API_GUIDE.md](API_GUIDE.md) | Complete API reference and examples | When integrating with API |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Production deployment guide | Before going to production |
+| [SECURITY.md](SECURITY.md) | Security implementation details | When handling auth or sensitive data |
+| [TEST.md](TEST.md) | Testing patterns and strategies | When writing tests |
+| [CLAUDE.md](CLAUDE.md) | Development guidelines and conventions | All developers |
+| [TASK.md](TASK.md) | Task tracking and progress | Daily development |
+| [backend/api/openapi.yaml](backend/api/openapi.yaml) | OpenAPI specification | API development |
+
 ## Features
 
 ### Backend (Completed)
@@ -180,6 +194,77 @@ The project includes comprehensive testing:
 - **Integration Tests**: Full API workflow testing
 - **Test Coverage**: >80% across all packages
 - **Test Tools**: Go testing, testify, miniredis for Redis mocking
+
+## Troubleshooting
+
+### Common Docker Issues
+
+**Problem**: "Empty reply from server" when accessing endpoints
+- **Solution**: Ensure `SERVER_HOST=0.0.0.0` is set in docker-compose.yml
+
+**Problem**: "Cannot connect to Redis"
+- **Solution**: Check Redis container is running: `docker-compose ps`
+- **Solution**: Verify Redis host in environment variables
+
+**Problem**: Port 8080 already in use
+- **Solution**: Stop conflicting service: `lsof -i :8080` then kill the process
+- **Solution**: Or change port in docker-compose.yml and environment variables
+
+**Problem**: Changes not reflecting in Docker
+- **Solution**: Rebuild containers: `docker-compose down && docker-compose up --build`
+- **Solution**: Check Air hot reload logs: `docker-compose logs backend`
+
+### Development Tips
+
+#### Adding New Endpoints
+
+1. Define the endpoint in `/backend/api/openapi.yaml`
+2. Add domain model if needed in `/backend/internal/domain`
+3. Implement repository method in `/backend/internal/repositories`
+4. Add service logic in `/backend/internal/services`
+5. Create handler in `/backend/internal/handlers`
+6. Add tests at each layer
+7. Update route in `/backend/cmd/server/main.go`
+
+#### Testing Strategies
+
+- **Unit Tests**: Run specific package tests: `go test ./internal/services/...`
+- **Integration Tests**: Run with Docker: `make test`
+- **Manual Testing**: Use curl or Postman with cookie storage
+- **Coverage Report**: `go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out`
+
+#### Debugging with Docker
+
+```bash
+# View real-time logs
+docker-compose logs -f backend
+
+# Access Redis CLI
+docker exec -it task-tracker-redis redis-cli
+
+# Check Redis keys for a user
+docker exec -it task-tracker-redis redis-cli KEYS "user:*"
+
+# Execute commands in backend container
+docker exec -it task-tracker-backend sh
+```
+
+### Performance Notes
+
+#### Redis Query Patterns
+
+- **Efficient**: Using sets for collections, sorted sets for time-ordering
+- **Avoid**: KEYS command in production (use SCAN instead)
+- **Indexes**: Secondary indexes maintained for email lookup and categories
+- **Pagination**: Use ZRANGE with LIMIT for sorted sets
+
+#### Optimization Opportunities
+
+1. **Caching**: Add caching layer for frequently accessed data
+2. **Batch Operations**: Use Redis pipelines for multiple operations
+3. **Connection Pooling**: Adjust pool size based on load
+4. **Query Optimization**: Use partial key matching with SCAN
+5. **Memory Management**: Set appropriate TTLs and eviction policies
 
 ## Contributing
 

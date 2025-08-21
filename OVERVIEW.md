@@ -5,28 +5,50 @@
 ## PROJECT PURPOSE & VISION
 
 ### Problem Statement
-*What problem does this application solve? Who experiences this problem?*
+Individuals struggle to organize and track their daily tasks effectively, leading to decreased productivity and forgotten responsibilities.
 
 ### Solution Overview
-*High-level description of how this application solves the problem*
+A simple, fast, and intuitive task management system that allows users to quickly capture tasks, organize them by categories, and track completion status with the ability to recover accidentally deleted items.
 
 ### Target Users
-*Primary and secondary user personas, their needs and pain points*
+- **Primary**: Individual professionals managing personal and work tasks
+- **Secondary**: Students organizing assignments and study tasks
+- **Needs**: Quick task entry, categorization, reliable storage, simple interface
 
 ### Success Metrics
-*How will we measure if this application is successful? (KPIs, usage metrics, business goals)*
+- User retention rate (target: 60% after 30 days)
+- Average tasks created per user per week (target: 20+)
+- Task completion rate (target: 70%)
+- System uptime (target: 99.9%)
 
 ## CORE FEATURES & FUNCTIONALITY
 
 ### MVP Features (Phase 1)
-*List features required for initial launch with brief descriptions*
-- [ ] Feature 1: Description
-- [ ] Feature 2: Description
+**Backend (Completed)**
+- [x] User Authentication: Registration, login, logout with sessions
+- [x] Task CRUD: Create, read, update, delete tasks
+- [x] Categories: User-created categories for organization
+- [x] Soft Delete: 7-day recovery window for deleted tasks
+- [x] API Documentation: Complete OpenAPI specification
+
+**Frontend (In Progress)**
+- [ ] Login/Register pages with form validation
+- [ ] Task list view with filtering and sorting
+- [ ] Task creation and editing forms
+- [ ] Category management interface
+- [ ] Responsive design for mobile and desktop
 
 ### Future Features (Phase 2+)
-*Planned enhancements and additions post-MVP*
-- [ ] Feature A: Description
-- [ ] Feature B: Description
+- [ ] Task Due Dates: Add deadlines with reminders
+- [ ] Task Priority: High/medium/low priority levels
+- [ ] Task Search: Full-text search across all tasks
+- [ ] Bulk Operations: Select and update multiple tasks
+- [ ] Task Templates: Reusable task templates
+- [ ] Data Export: Export tasks to CSV/JSON
+- [ ] Dark Mode: Theme switching support
+- [ ] Collaborative Lists: Share task lists with others
+- [ ] Recurring Tasks: Daily/weekly/monthly task patterns
+- [ ] Task Attachments: File uploads for tasks
 
 ### Non-Functional Requirements
 - **Performance**: Response time targets, concurrent user limits

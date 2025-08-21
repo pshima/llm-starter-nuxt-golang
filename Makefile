@@ -42,3 +42,9 @@ mailhog: ## Open MailHog web UI
 rebuild: ## Rebuild and restart containers
 	docker-compose down
 	docker-compose up --build
+
+check-docs: ## Validate documentation is complete and up-to-date
+	@./scripts/check-docs.sh
+
+pre-commit: check-docs test ## Run checks before committing
+	@echo "✅ All pre-commit checks passed!"
