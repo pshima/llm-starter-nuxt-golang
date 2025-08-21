@@ -1,0 +1,42 @@
+services:
+  backend-test:
+    build:
+      context: ./backend
+      target: dev
+    container_name: task-tracker-backend-test
+    command: go test -v -timeout 5s ./...
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENV=test
+      - SERVER_PORT=8080
+      - REDIS_HOST=redis-test
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - SESSION_SECRET=test-secret-key
+      - SMTP_HOST=mailhog-test
+      - SMTP_PORT=1025
+      - SMTP_FROM=noreply@no.reply.com
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000
+    depends_on:
+      - redis-test
+      - mailhog-test
+    networks:
+      - task-tracker-test-network
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: task-tracker-redis-test
+    command: redis-server --appendonly no
+    networks:
+      - task-tracker-test-network
+
+  mailhog-test:
+    image: mailhog/mailhog:latest
+    container_name: task-tracker-mailhog-test
+    networks:
+      - task-tracker-test-network
+
+networks:
+  task-tracker-test-network:
+    driver: bridge

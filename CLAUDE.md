@@ -21,6 +21,7 @@
 - Build modules and components and build an architecture and codebase 
 - Do not make up or imagine any libraries that do not exist.  If we import or utilize a library it needs to be a real library.
 - Hot reload should be enabled for development.  We should not be rebuilding and restarting contianers to see changes.  Prioritize this.
+- Add files we should not commit to source code to the .gitignore file BEFORE we do any commits.
 
 ## Philosophical
 - Simple is better than complicated
@@ -115,7 +116,7 @@
   - Developed as the app develops, this list should be updated.
 
 ## Technical Decisions
-- **Backend Framework**: Go with Gin
+- **Backend Framework**: Go 1.25 with Gin
 - **Frontend Framework**: Nuxt.js with TypeScript
 - **State Management**: Pinia for frontend state management
 - **UI Styling**: Tailwind CSS (use wherever possible)
@@ -133,6 +134,7 @@
 - **Ports**: Backend: 8080, Frontend: 3000 (confirm availability before starting)
 - **Domain**: Use localhost initially, configure custom domain when specified
 - **Google OAuth**: Use placeholder configuration for development (to be replaced with actual credentials)
+- **Docker configuration version**: Do not include a version line in any dockerfiles or docker compose files, these are deprecated.
 
 ## Project Structure
 - **Backend**: /backend directory

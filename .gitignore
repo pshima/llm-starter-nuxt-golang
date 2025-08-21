@@ -1,0 +1,167 @@
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# IDE Files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+*.iml
+*.ipr
+*.iws
+
+# Go Backend
+/backend/tmp/
+/backend/vendor/
+/backend/*.exe
+/backend/*.exe~
+/backend/*.dll
+/backend/*.so
+/backend/*.dylib
+/backend/*.test
+/backend/*.out
+/backend/build-errors.log
+/backend/main
+/backend/.air.tmp/
+/backend/gin-bin
+/backend/coverage.txt
+/backend/coverage.html
+/backend/*.prof
+/backend/go.work
+/backend/go.work.sum
+
+# Nuxt Frontend (for future use)
+/frontend/.nuxt/
+/frontend/.output/
+/frontend/dist/
+/frontend/node_modules/
+/frontend/.nitro/
+/frontend/.cache/
+/frontend/.env
+/frontend/.env.*
+!frontend/.env.example
+/frontend/logs/
+/frontend/*.log
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/pnpm-debug.log*
+/frontend/.pnpm-store/
+
+# Docker
+docker-compose.override.yml
+.dockerignore.local
+
+# Environment Files
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.sample
+
+# Session and Auth Files
+cookies.txt
+sessions/
+*.session
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+redis-data/
+dump.rdb
+appendonly.aof
+
+# Log Files
+*.log
+logs/
+log/
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+*.cover
+*.coverage
+.coverage
+.pytest_cache/
+.phpunit.result.cache
+test-reports/
+
+# Build Outputs
+dist/
+build/
+out/
+target/
+bin/
+obj/
+
+# Package Manager
+node_modules/
+bower_components/
+jspm_packages/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# Security
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+private/
+
+# Documentation Build
+docs/_build/
+docs/.doctrees/
+site/
+
+# Miscellaneous
+.cache/
+.parcel-cache/
+.sass-cache/
+*.orig
+.grunt/
+.npm/
+.yarn/
+.pnp.*
+.yarn-integrity
+
+# Project Specific
+/data/
+/uploads/
+/downloads/
+/storage/
+*.local.*

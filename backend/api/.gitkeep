@@ -1,0 +1,3 @@
+# This file ensures the api directory is tracked by git
+# This directory will contain OpenAPI specifications
+# Remove this file when adding the first API spec
